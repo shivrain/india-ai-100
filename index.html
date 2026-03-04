@@ -1419,49 +1419,11 @@
       <div class="cb-sub">Total funding in $M — bars scaled to maximum</div>
       <div class="fund-list" id="fund-list"></div>
     </div>
-
-    <div class="card-box reveal">
-      <div class="cb-title">Funding by Sector</div>
-      <div class="cb-sub">Aggregate capital by sector ($M)</div>
-      <div><canvas id="chart-sector-funding"></canvas></div>
-    </div>
   </section>
 
   <div class="divider">
     <hr>
   </div>
-
-  <!-- DARK INTERSTITIAL -->
-  <div style="background:var(--dark);color:#fff;padding:72px 48px;text-align:center;position:relative;overflow:hidden;">
-    <div
-      style="position:absolute;top:-30%;right:-10%;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(251,91,81,0.08) 0%,transparent 60%);">
-    </div>
-    <div
-      style="font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--coral);margin-bottom:14px;position:relative;">
-      Maturity Pipeline</div>
-    <div
-      style="font-family:var(--serif);font-size:clamp(32px,5vw,56px);font-weight:700;letter-spacing:-2px;line-height:1.05;margin-bottom:10px;position:relative;">
-      Over half sit at <em style="font-weight:400;color:var(--coral);">Seed</em></div>
-    <div style="font-size:16px;opacity:0.6;max-width:480px;margin:0 auto;position:relative;line-height:1.6;">Only a
-      handful have crossed Series C — this is a nascent market with enormous upside ahead.</div>
-  </div>
-
-  <!-- MATURITY -->
-  <section class="section" id="maturity">
-    <div class="chart-grid reveal">
-      <div class="card-box">
-        <div class="cb-title">Company Count by Stage</div>
-        <div class="cb-sub">The startup maturity pipeline</div>
-        <div class="pipeline" id="pipeline"></div>
-      </div>
-      <div class="card-box">
-        <div class="cb-title">Avg. Funding by Stage</div>
-        <div class="cb-sub">Mean raise at each maturity level ($M)</div>
-        <div><canvas id="chart-avg-stage"></canvas></div>
-      </div>
-    </div>
-  </section>
-
 
 
   <!-- EXPLORER -->
@@ -1670,36 +1632,6 @@
       }); setTimeout(() => { document.querySelectorAll('.fr-fill').forEach(b => { b.style.width = b.dataset.w + '%' }) }, 400)
     }();
 
-    // ===== PIPELINE =====
-    !function () {
-      const ord = ['Seed', 'Pre-Series A', 'Series A', 'Pre-Series B', 'Series B', 'Series C', 'Series D'];
-      const cnt = {}; D.forEach(c => { cnt[c.St] = (cnt[c.St] || 0) + 1 }); const mx = Math.max(...Object.values(cnt));
-      const cols = ['#FB5B51', '#FC7C74', '#180A2B', '#3F3C39', '#C17F59', '#5B8DAF', '#8B6AAE'];
-      const el = document.getElementById('pipeline');
-      ord.forEach((s, i) => {
-        const n = cnt[s] || 0, h = (n / mx) * 88; const d = document.createElement('div'); d.className = 'pipe-col';
-        d.innerHTML = `<div class="pipe-count">${n}</div><div class="pipe-bar" style="height:${h}%;background:${cols[i]}"></div><div class="pipe-label">${s}</div>`;
-        el.appendChild(d)
-      })
-    }();
-
-    // ===== CHARTS =====
-    Chart.defaults.color = '#9E9899'; Chart.defaults.borderColor = '#EDE8E0'; Chart.defaults.font.family = "'DM Sans',sans-serif";
-    const cTooltip = { backgroundColor: '#180A2B', titleFont: { family: "'Playfair Display',serif", weight: '600' }, bodyFont: { family: "'JetBrains Mono',monospace", size: 12 }, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 12, cornerRadius: 8 };
-
-    // Sector Funding Doughnut
-    !function () {
-      const sf = {}; D.forEach(c => { sf[c.S] = (sf[c.S] || 0) + c.F }); const l = Object.keys(sf), d = Object.values(sf).map(v => Math.round(v));
-      new Chart(document.getElementById('chart-sector-funding'), { type: 'doughnut', data: { labels: l, datasets: [{ data: d, backgroundColor: l.map(x => sColors[x]), borderWidth: 2, borderColor: '#FFFFFF', hoverOffset: 10 }] }, options: { responsive: true, cutout: '62%', plugins: { legend: { position: 'bottom', labels: { padding: 14, usePointStyle: true, pointStyle: 'rectRounded', font: { family: "'JetBrains Mono',monospace", size: 10 } } }, tooltip: { ...cTooltip, callbacks: { label: c => ` $${c.raw}M (${Math.round(c.raw / d.reduce((a, b) => a + b, 0) * 100)}%)` } } } } })
-    }();
-
-    // Avg Funding by Stage
-    !function () {
-      const sd = {}; D.forEach(c => { if (!sd[c.St]) sd[c.St] = { t: 0, n: 0 }; sd[c.St].t += c.F; sd[c.St].n++ });
-      const ord = ['Seed', 'Pre-Series A', 'Series A', 'Pre-Series B', 'Series B', 'Series C', 'Series D'];
-      const l = ord.filter(s => sd[s]), d = l.map(x => Math.round((sd[x].t / sd[x].n) * 10) / 10);
-      new Chart(document.getElementById('chart-avg-stage'), { type: 'bar', data: { labels: l, datasets: [{ data: d, backgroundColor: '#FB5B51', borderRadius: 6, borderSkipped: false }] }, options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...cTooltip, callbacks: { label: c => ` $${c.raw}M avg` } } }, scales: { x: { grid: { display: false }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 10 } } }, y: { grid: { color: '#EDE8E0' }, ticks: { font: { family: "'JetBrains Mono',monospace", size: 10 }, callback: v => '$' + v + 'M' } } } } })
-    }();
 
     // ===== COMPANY CARDS =====
     let curFilter = 'All';
